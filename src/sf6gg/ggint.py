@@ -4,7 +4,11 @@ from sgqlc.endpoint.http import HTTPEndpoint
 from sgqlc.operation import Operation
 from sgqlc.types import ID, Arg, String, Variable
 
-from sf6gg.ggschema import get_schema
+from sf6gg.ggschema import ggschema
+
+
+def get_schema():
+    return ggschema
 
 
 def run_endpoint(op, variables=None):
