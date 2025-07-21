@@ -7,7 +7,9 @@ authors = [
     { name = "Shinya Sasaki", email = "shinya.sasaki@kek.jp" }
 ]
 requires-python = ">=3.13"
-dependencies = []
+dependencies = [
+    "sgqlc>=16.5",
+]
 
 [project.scripts]
 sf6gg = "sf6gg:main"
