@@ -1,0 +1,17 @@
+[project]
+name = "sf6gg"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "Shinya Sasaki", email = "shinya.sasaki@kek.jp" }
+]
+requires-python = ">=3.13"
+dependencies = []
+
+[project.scripts]
+sf6gg = "sf6gg:main"
+
+[build-system]
+requires = ["uv_build>=0.8.0,<0.9"]
+build-backend = "uv_build"
