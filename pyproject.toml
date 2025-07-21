@@ -8,11 +8,12 @@ authors = [
 ]
 requires-python = ">=3.13"
 dependencies = [
+    "click>=8.2.1",
     "sgqlc>=16.5",
 ]
 
 [project.scripts]
-sf6gg = "sf6gg:main"
+sf6gg = "sf6gg.cli:cli"
 
 [build-system]
 requires = ["uv_build>=0.8.0,<0.9"]

@@ -2,7 +2,7 @@ import os
 
 from sgqlc.endpoint.http import HTTPEndpoint
 from sgqlc.operation import Operation
-from sgqlc.types import Arg, String, Variable
+from sgqlc.types import ID, Arg, String, Variable
 
 from sf6gg.ggschema import get_schema
 
@@ -28,5 +28,22 @@ def get_tournament_events(slug: str):
         },
     )
     op.tournament(slug=Variable("slug"))
+
+    return run_endpoint(op, variables)
+
+
+def get_event(id: str):
+    schema = get_schema()
+    variables = {"id": id}
+
+    op = Operation(
+        schema.Query,
+        variables={
+            "id": Arg(ID),
+        },
+    )
+    op.event(id=Variable("id")).__fields__(
+        id=True, name=True, standings={"query": {"page": 1, "perPage": 10}}
+    )
 
     return run_endpoint(op, variables)
