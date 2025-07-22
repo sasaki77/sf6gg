@@ -31,12 +31,15 @@ def get_tournament_events(slug: str):
             "slug": Arg(String),
         },
     )
-    op.tournament(slug=Variable("slug"))
+    tournament = op.tournament(slug=Variable("slug"))
+    tournament.__fields__("id", "name", "start_at")
+    events = tournament.events
+    events.__fields__("id", "name", "start_at", "num_entrants")  # type: ignore
 
     return run_endpoint(op, variables)
 
 
-def get_event(id: str):
+def get_event_phase(id: str):
     schema = get_schema()
     variables = {"id": id}
 
@@ -46,8 +49,60 @@ def get_event(id: str):
             "id": Arg(ID),
         },
     )
-    op.event(id=Variable("id")).__fields__(
-        id=True, name=True, standings={"query": {"page": 1, "perPage": 10}}
+    event = op.event(id=Variable("id"))
+    event.__fields__("id", "name")
+    phases = event.phases  # type: ignore
+    phases.__fields__("id", "phase_order", "name")
+
+    return run_endpoint(op, variables)
+
+
+def get_event_entrants(id: str, page=1, per_page=100):
+    schema = get_schema()
+    variables = {"id": id}
+
+    op = Operation(
+        schema.Query,
+        variables={
+            "id": Arg(ID),
+        },
     )
+    event = op.event(id=Variable("id"))
+    event.__fields__("id", "name")
+    standings = event.standings(query={"page": page, "perPage": per_page})  # type: ignore
+    # entrants = standings.entrants
+    nodes = standings.nodes
+    nodes.__fields__("id", "placement")  # type: ignore
+    entrant = nodes.entrant  # type: ignore
+    entrant.__fields__("id", "name")
+    player = nodes.player  # type: ignore
+    player.__fields__("id", "gamer_tag")
+
+    return run_endpoint(op, variables)
+
+
+def get_event_sets(id: str, page=1, per_page=100):
+    schema = get_schema()
+    variables = {"id": id}
+
+    op = Operation(
+        schema.Query,
+        variables={
+            "id": Arg(ID),
+        },
+    )
+    event = op.event(id=Variable("id"))
+    event.__fields__("id", "name")
+    sets = event.sets(page=page, per_page=per_page)  # type: ignore
+    nodes = sets.nodes
+    nodes.__fields__("id", "full_round_text", "winner_id", "display_score")  # type: ignore
+    phase_group = nodes.phase_group  # type: ignore
+    phase_group.__fields__("display_identifier", "bracket_url")
+    phase = phase_group.phase
+    phase.__fields__("id", "phase_order", "name")
+    slots = nodes.slots  # type: ignore
+    slots.__fields__("id")
+    entrant = slots.entrant
+    entrant.__fields__("id", "name")
 
     return run_endpoint(op, variables)
