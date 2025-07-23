@@ -57,6 +57,38 @@ def get_event_phase(id: str):
     return run_endpoint(op, variables)
 
 
+def get_event_phase_group(event_id: str, phase_id: str, page: int, per_page: int):
+    schema = get_schema()
+    variables = {
+        "eventId": event_id,
+        "phaseId": phase_id,
+        "page": page,
+        "perPage": per_page,
+    }
+
+    op = Operation(
+        schema.Query,
+        variables={
+            "eventId": Arg(ID),
+            "phaseId": Arg(ID),
+            "page": int,
+            "perPage": int,
+        },
+    )
+    event = op.event(id=Variable("eventId"))
+    event.__fields__("id", "name")
+    phases = event.phases(phase_id=Variable("phaseId"))  # type: ignore
+    phases.__fields__("id", "phase_order", "name")
+    phase_groups = phases.phase_groups(
+        query={"page": Variable("page"), "perPage": Variable("perPage")}
+    )
+    nodes = phase_groups.nodes
+    nodes.__fields__("id", "display_identifier", "bracket_url")  # type: ignore
+    print(op)
+
+    return run_endpoint(op, variables)
+
+
 def get_event_entrants(id: str, page=1, per_page=100):
     schema = get_schema()
     variables = {"id": id}
@@ -76,7 +108,7 @@ def get_event_entrants(id: str, page=1, per_page=100):
     entrant = nodes.entrant  # type: ignore
     entrant.__fields__("id", "name")
     player = nodes.player  # type: ignore
-    player.__fields__("id", "gamer_tag")
+    player.__fields__("id", "gamer_tag", "prefix")
 
     return run_endpoint(op, variables)
 
@@ -95,14 +127,17 @@ def get_event_sets(id: str, page=1, per_page=100):
     event.__fields__("id", "name")
     sets = event.sets(page=page, per_page=per_page)  # type: ignore
     nodes = sets.nodes
-    nodes.__fields__("id", "full_round_text", "winner_id", "display_score")  # type: ignore
+    nodes.__fields__("id", "full_round_text", "winner_id", "display_score", "round")  # type: ignore
+    # game = nodes.game
+    # game.__fields__("id")
     phase_group = nodes.phase_group  # type: ignore
-    phase_group.__fields__("display_identifier", "bracket_url")
+    phase_group.__fields__("id", "display_identifier", "bracket_url")
     phase = phase_group.phase
     phase.__fields__("id", "phase_order", "name")
     slots = nodes.slots  # type: ignore
     slots.__fields__("id")
     entrant = slots.entrant
     entrant.__fields__("id", "name")
+    print(op)
 
     return run_endpoint(op, variables)

@@ -6,6 +6,7 @@ import click
 from sf6gg.ggint import (
     get_event_entrants,
     get_event_phase,
+    get_event_phase_group,
     get_event_sets,
     get_tournament_events,
 )
@@ -35,6 +36,20 @@ def tournament(slug):
 
 
 @cli.command()
+@click.option("--page", "-p", "page", type=int, default=1)
+@click.option("--pagePage", "-P", "per_page", type=int, default=100)
+@click.argument("id", type=int)
+def standing(id, page, per_page):
+    data = get_event_entrants(id, page, per_page)
+
+    event = data["data"]["event"]
+    print(f"Event name: {event['name']}")
+    print("Standings:")
+    for standing in event["standings"]["nodes"]:
+        print(standing)
+
+
+@cli.command()
 @click.argument("id", type=int)
 def phase(id):
     data = get_event_phase(id)
@@ -47,21 +62,24 @@ def phase(id):
 
 
 @cli.command()
-@click.argument("id", type=int)
-def event(id):
-    data = get_event_entrants(id)
+@click.option("--page", "-p", "page", type=int, default=1)
+@click.option("--pagePage", "-P", "per_page", type=int, default=100)
+@click.argument("event_id", type=int)
+@click.argument("phase_id", type=int)
+def phaseGroup(event_id, phase_id, page, per_page):
+    data = get_event_phase_group(event_id, phase_id, page, per_page)
 
     event = data["data"]["event"]
     print(f"Event name: {event['name']}")
-    print("Standings:")
-    for standing in event["standings"]["nodes"]:
-        print(standing)
+    pprint(event)
 
 
 @cli.command()
+@click.option("--page", "-p", "page", type=int, default=1)
+@click.option("--pagePage", "-P", "per_page", type=int, default=100)
 @click.argument("id", type=int)
-def sets(id):
-    data = get_event_sets(id)
+def sets(id, page, per_page):
+    data = get_event_sets(id, page, per_page)
 
     event = data["data"]["event"]
     print(f"Event name: {event['name']}")
