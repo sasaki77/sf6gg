@@ -16,3 +16,6 @@ venv/
 # Unit test
 .tox
 .pytest_cache/
+
+# db file
+*.db

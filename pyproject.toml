@@ -10,6 +10,7 @@ requires-python = ">=3.13"
 dependencies = [
     "click>=8.2.1",
     "sgqlc>=16.5",
+    "sqlalchemy>=2.0.41",
 ]
 
 [project.scripts]
